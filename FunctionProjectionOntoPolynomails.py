@@ -1,5 +1,6 @@
 import numpy as np
 from sympy import Matrix
+import matplotlib.pyplot as plt
 
 def powX(n):
     """
@@ -7,12 +8,22 @@ def powX(n):
     """
     return lambda x: x**n
 
+#***Parameters***
+#****************
+
+print_solution_vector=True
+print_area_gap=True
+display_graph=True
+
 POINTS_OF_INTEGRATION = 1000
-BASIS_VECTOR_SIZE = 6  # Specify the size of the basis vector array
+BASIS_VECTOR_SIZE = 70  # Specify the size of the basis vector array
 
-bounds = [.1, 4]
+bounds = [-np.pi, np.pi]
 
-inf_dim_vector_to_project = np.log
+inf_dim_vector_to_project = np.cos
+
+#***End Parameters***
+#********************
 
 # Generate basis vectors based on the specified size
 basis_vectors = [powX(i) for i in range(BASIS_VECTOR_SIZE)]
@@ -30,7 +41,7 @@ def RealL2InnerProduct(a, b):
     """
     Computes the L2 inner product of two functions a and b over the domain.
     """
-    return np.trapz(a_values * b_values, x)  # Using trapezoidal rule for numerical integration
+    return np.trapezoid(a_values * b_values, x)  # Using trapezoidal rule for numerical integration
 
 def main():
     basis_size = len(basis_vectors)
@@ -54,15 +65,30 @@ def main():
     # Truncate the solution vector to 7 decimal places
     truncated_solution_vector = [round(float(val), 7) for val in solution_vector]
 
-    print("The solution vector c is: \nA =", truncated_solution_vector)
-    #print(truncated_solution_vector)
+    if print_solution_vector:
+        print("The solution vector c is: \nA =", truncated_solution_vector)
 
     return solution_vector
 
 def f(a, x):
-    return a * np.pow(x, np.arange(len(x)))
+    return sum(a[i] * x**i for i in range(len(a)))
 
 if __name__ == "__main__":
     coefficients = main()
-    # f(coefficients, np.linspace(-np.pi, np.pi, 1000))
+    x_values = np.linspace(bounds[0], bounds[1], POINTS_OF_INTEGRATION)
+    projected_values = f(coefficients, x_values)
+    original_values = inf_dim_vector_to_project(x_values)
+
+    if display_graph:
+        plt.plot(x_values, original_values, label='Original Function (sin(x))')
+        plt.plot(x_values, projected_values, label='Projected Function', linestyle='--')
+        plt.legend()
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.title('Comparison of Original and Projected Functions')
+        plt.show()
+
+    if print_area_gap:
+        area_gap = np.trapezoid(np.abs(original_values - projected_values), x_values)
+        print(f"The area of the gap between the projected and original function is: {area_gap}")
 
