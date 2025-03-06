@@ -16,20 +16,20 @@ print_area_gap=True
 display_graph=True
 
 POINTS_OF_INTEGRATION = 1000
-BASIS_VECTOR_SIZE = 70  # Specify the size of the basis vector array
+BASIS_VECTOR_SIZE = 10  # Specify the size of the basis vector array
 
-bounds = [-np.pi, np.pi]
+bounds = [.1, 5]
 
-inf_dim_vector_to_project = np.cos
-
-#***End Parameters***
-#********************
+inf_dim_vector_to_project = np.log
 
 # Generate basis vectors based on the specified size
 basis_vectors = [powX(i) for i in range(BASIS_VECTOR_SIZE)]
 
 def inner_product(a, b):
     return RealL2InnerProduct(a, b)  # L2 inner product
+
+#***End Parameters***
+#********************
 
 def RealL2InnerProduct(a, b):
     x = np.linspace(bounds[0], bounds[1], POINTS_OF_INTEGRATION)  # Generate 1000 points between the bounds
@@ -66,7 +66,8 @@ def main():
     truncated_solution_vector = [round(float(val), 7) for val in solution_vector]
 
     if print_solution_vector:
-        print("The solution vector c is: \nA =", truncated_solution_vector)
+        #print("The solution vector c is: \nA =", truncated_solution_vector)
+        print("The solution vector c is: \nA =", solution_vector)
 
     return solution_vector
 
@@ -80,7 +81,7 @@ if __name__ == "__main__":
     original_values = inf_dim_vector_to_project(x_values)
 
     if display_graph:
-        plt.plot(x_values, original_values, label='Original Function (sin(x))')
+        plt.plot(x_values, original_values, label='Original Function')
         plt.plot(x_values, projected_values, label='Projected Function', linestyle='--')
         plt.legend()
         plt.xlabel('x')
